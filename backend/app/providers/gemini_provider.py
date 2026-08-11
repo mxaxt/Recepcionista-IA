@@ -1,28 +1,50 @@
-from dotenv import load_dotenv
-from fastapi import FastAPI
+import os
+from typing import Any
 
-from app.agents.agent import Agent
-from app.providers.gemini_provider import GeminiProvider
+from google import genai
+from google.genai import types
 
-
-load_dotenv()
-
-
-app = FastAPI(
-    title="Recepcionista",
-    version="0.1.0",
-)
+from app.providers.base import LLMProvider
 
 
-provider = GeminiProvider()
-agent = Agent(provider)
+class GeminiProvider(LLMProvider):
 
+    def __init__(self):
+        api_key = os.getenv("GEMINI_API_KEY")
 
-@app.get("/")
-async def root():
+        if not api_key:
+            raise ValueError(
+                "No se encontró GEMINI_API_KEY en las variables de entorno."
+            )
 
-    response = await agent.chat("Hola")
+        self.client = genai.Client(api_key=api_key)
 
-    return {
-        "response": response
-    }
+    async def generate(
+        self,
+        messages: list[dict[str, Any]],
+        system_instruction: str | None = None,
+        tools: list | None = None,
+    ) -> dict:
+
+        conversation = []
+
+        for message in messages:
+            conversation.append(
+                f"{message['role']}: {message['content']}"
+            )
+
+        conversation_text = "\n".join(conversation)
+
+        config = types.GenerateContentConfig(
+            system_instruction=system_instruction
+        )
+
+        response = await self.client.aio.models.generate_content(
+            model="gemini-2.5-flash",
+            contents=conversation_text,
+            config=config,
+        )
+
+        return {
+            "content": response.text
+        }
