@@ -10,12 +10,48 @@ class Agent:
         provider: LLMProvider,
         memory: ConversationMemory,
         system_prompt: str,
-        classifier: IntentClassifier
+        classifier: IntentClassifier,
+        agenda=None,
     ):
         self.provider = provider
         self.memory = memory
         self.system_prompt = system_prompt
         self.classifier = classifier
+        self.agenda = agenda
+
+    def check_availability(
+        self,
+        preferred_date=None,
+        priority: bool = False,
+    ) -> dict:
+        if self.agenda is None:
+            raise RuntimeError(
+                "El agente no tiene agenda configurada."
+            )
+
+        return self.agenda.check_availability(
+            preferred_date=preferred_date,
+            priority=priority,
+        )
+
+    def book_appointment(
+        self,
+        date,
+        start_time,
+        patient_id: str,
+        priority: bool = False,
+    ) -> dict:
+        if self.agenda is None:
+            raise RuntimeError(
+                "El agente no tiene agenda configurada."
+            )
+
+        return self.agenda.reserve(
+            date=date,
+            start_time=start_time,
+            patient_id=patient_id,
+            priority=priority,
+        )
 
     async def chat(
         self,

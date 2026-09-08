@@ -7,9 +7,11 @@ from fastapi import FastAPI
 from app.agents.agent import Agent
 from app.api.agenda import router as agenda_router
 from app.classifiers.intent_classifier import IntentClassifier
+from app.core.agenda_container import get_agenda
 from app.memory.conversation import ConversationMemory
 from app.providers.gemini_provider import GeminiProvider
 from app.schemas.chat import ChatRequest
+from app.tools.agenda_tools import AgendaTools
 
 
 load_dotenv()
@@ -54,11 +56,16 @@ classifier = IntentClassifier(
 )
 
 
+# El Agent comparte la misma Agenda en memoria que expone la API.
+agenda_tools = AgendaTools(agenda=get_agenda())
+
+
 agent = Agent(
     provider=provider,
     memory=memory,
     system_prompt=system_prompt,
-    classifier=classifier
+    classifier=classifier,
+    agenda=agenda_tools,
 )
 
 
