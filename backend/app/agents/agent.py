@@ -12,12 +12,14 @@ class Agent:
         system_prompt: str,
         classifier: IntentClassifier,
         agenda=None,
+        reviews=None,
     ):
         self.provider = provider
         self.memory = memory
         self.system_prompt = system_prompt
         self.classifier = classifier
         self.agenda = agenda
+        self.reviews = reviews
 
     def check_availability(
         self,
@@ -62,6 +64,16 @@ class Agent:
         classification = await self.classifier.classify(
             message
         )
+
+        if (
+            self.reviews is not None
+            and classification.get("status") == "PRIORITY"
+        ):
+            self.reviews.create_review(
+                session_id=session_id,
+                message=message,
+                classification=classification,
+            )
 
         self.memory.add_message(
             session_id,

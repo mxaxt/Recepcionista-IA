@@ -53,6 +53,16 @@ def book_appointment(
     payload: AppointmentCreate,
     agenda: Agenda = Depends(get_agenda),
 ):
+    if payload.appointment_type == AppointmentType.PRIORITY:
+        raise HTTPException(
+            status_code=403,
+            detail=(
+                "Los turnos priority no se reservan por esta via: deben "
+                "ser aprobados primero por un humano mediante un caso de "
+                "revision en /reviews."
+            ),
+        )
+
     try:
         appointment = agenda.book_appointment(
             payload.date,

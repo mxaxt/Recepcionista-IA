@@ -6,8 +6,10 @@ from fastapi import FastAPI
 
 from app.agents.agent import Agent
 from app.api.agenda import router as agenda_router
+from app.api.reviews import router as reviews_router
 from app.classifiers.intent_classifier import IntentClassifier
 from app.core.agenda_container import get_agenda
+from app.core.review_container import get_priority_review_service
 from app.memory.conversation import ConversationMemory
 from app.providers.gemini_provider import GeminiProvider
 from app.schemas.chat import ChatRequest
@@ -24,6 +26,7 @@ app = FastAPI(
 
 
 app.include_router(agenda_router)
+app.include_router(reviews_router)
 
 
 api_key = os.getenv("GEMINI_API_KEY")
@@ -66,6 +69,7 @@ agent = Agent(
     system_prompt=system_prompt,
     classifier=classifier,
     agenda=agenda_tools,
+    reviews=get_priority_review_service(),
 )
 
 

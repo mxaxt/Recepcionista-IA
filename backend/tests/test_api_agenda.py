@@ -118,7 +118,7 @@ class ApiAgendaTests(unittest.TestCase):
         self.assertEqual(response.status_code, 201)
         self.assertEqual(response.json()["appointment_type"], "normal")
 
-    def test_book_priority_exitoso(self):
+    def test_book_priority_directo_por_api_es_rechazado(self):
         response = self.client.post(
             "/agenda/appointments",
             json={
@@ -129,8 +129,8 @@ class ApiAgendaTests(unittest.TestCase):
             },
         )
 
-        self.assertEqual(response.status_code, 201)
-        self.assertEqual(response.json()["appointment_type"], "priority")
+        self.assertEqual(response.status_code, 403)
+        self.assertEqual(len(self.agenda.appointments), 3)
 
     def test_book_doble_reserva_devuelve_409(self):
         payload = {
