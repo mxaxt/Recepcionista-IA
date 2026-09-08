@@ -5,6 +5,7 @@ from dotenv import load_dotenv
 from fastapi import FastAPI
 
 from app.agents.agent import Agent
+from app.api.agenda import router as agenda_router
 from app.classifiers.intent_classifier import IntentClassifier
 from app.memory.conversation import ConversationMemory
 from app.providers.gemini_provider import GeminiProvider
@@ -18,6 +19,9 @@ app = FastAPI(
     title="Recepcionista",
     version="0.1.0",
 )
+
+
+app.include_router(agenda_router)
 
 
 api_key = os.getenv("GEMINI_API_KEY")
