@@ -12,6 +12,7 @@ priority) siguen viviendo exclusivamente en app.services.agenda.
 from datetime import date, datetime, timedelta
 from typing import Any
 
+from app.core.config import clinic_today
 from app.models.agenda import AppointmentType
 from app.services.agenda import (
     Agenda,
@@ -80,7 +81,7 @@ class AgendaTools:
                 start = _to_date(
                     reference_date
                     if reference_date is not None
-                    else date.today()
+                    else clinic_today()
                 )
             except (ValueError, TypeError):
                 return {

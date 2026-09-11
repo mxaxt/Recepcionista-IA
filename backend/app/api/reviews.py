@@ -6,6 +6,7 @@ reglas de negocio ni de agenda.
 
 from fastapi import APIRouter, Depends, HTTPException, Query
 
+from app.core.security import require_admin_token
 from app.models.review import ReviewStatus
 from app.schemas.review import (
     ApproveRequest,
@@ -22,7 +23,11 @@ from app.services.priority_review import (
 from app.core.review_container import get_priority_review_service
 
 
-router = APIRouter(prefix="/reviews", tags=["reviews"])
+router = APIRouter(
+    prefix="/reviews",
+    tags=["reviews"],
+    dependencies=[Depends(require_admin_token)],
+)
 
 
 PRIORITY_CLASSIFICATION_STATUS = "PRIORITY"

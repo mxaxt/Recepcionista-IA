@@ -1,0 +1,28 @@
+# Blueprint de Render para el despliegue demo de la recepcionista.
+#
+# - rootDir: backend  => el repo se clava completo y build/start corren
+#   dentro de backend/. main.py resuelve prompts/ con parents[2] (raiz
+#   del repo), por eso la raiz del repo debe seguir siendo el contexto.
+# - Un solo worker: Agenda, Reviews y ConversationMemory viven en RAM
+#   del proceso; mas workers tendrian agendas divergentes.
+# - Sin --reload.
+services:
+  - type: web
+    name: recepcionista
+    runtime: python
+    plan: free
+    rootDir: backend
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT --workers 1
+    healthCheckPath: /
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.14.3
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: TELEGRAM_BOT_TOKEN
+        sync: false
+      - key: TELEGRAM_WEBHOOK_SECRET
+        generateValue: true
+      - key: ADMIN_API_TOKEN
+        generateValue: true

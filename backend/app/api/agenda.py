@@ -2,6 +2,7 @@ from datetime import date
 
 from fastapi import APIRouter, Depends, HTTPException, Query
 
+from app.core.security import require_admin_token
 from app.models.agenda import AppointmentType
 from app.schemas.agenda import (
     AppointmentCreate,
@@ -24,7 +25,11 @@ from app.core.agenda_container import create_dev_agenda, get_agenda
 # ---------------------------------------------------------------------------
 # API
 # ---------------------------------------------------------------------------
-router = APIRouter(prefix="/agenda", tags=["agenda"])
+router = APIRouter(
+    prefix="/agenda",
+    tags=["agenda"],
+    dependencies=[Depends(require_admin_token)],
+)
 
 
 @router.get("/slots", response_model=SlotsResponse)
